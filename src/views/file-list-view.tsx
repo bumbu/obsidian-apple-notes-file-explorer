@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
-import { App, TFile } from "obsidian";
+import { App, TFile, Menu } from "obsidian";
 
 import Plugin from "../main";
 import { RootView } from "./root-view";
@@ -11,7 +11,6 @@ const OPEN_IN_NEW_TAB = true;
 
 /*
  * TODO
- * Contex menu: delete
  * Render last change date/time
  * * For today: only the time
  * * Yesterday
@@ -96,7 +95,7 @@ export const FileListView = ({
   );
 };
 
-const ItemView = ({ file, app, isSelected }: { file: TFile, app: App, isSelected: boolean }) => {
+const ItemView = ({ file, app, isSelected }: { file: TFile, app: App, isSelected: boolean}) => {
 	return (
 		<div
 			style={{
@@ -115,6 +114,19 @@ const ItemView = ({ file, app, isSelected }: { file: TFile, app: App, isSelected
 			}}
 			onClick={() => {
 				app.workspace.openLinkText(file.path, "", OPEN_IN_NEW_TAB);
+			}}
+			onContextMenu={(event) => {
+				// Actions
+				const menu = new Menu();
+				menu.addItem((item) =>
+					item
+						.setTitle("Delete")
+						.setIcon("delete")
+						.onClick((event) => {
+							app.vault.delete(file);
+						})
+				);
+				menu.showAtMouseEvent(event);
 			}}
 		>
 			<div
@@ -138,7 +150,7 @@ const ItemView = ({ file, app, isSelected }: { file: TFile, app: App, isSelected
 					overflow: "hidden",
 				}}
 			>
-				<div style={{margin: "0 8px 0 0"}}>00:00</div>
+				<div style={{ margin: "0 8px 0 0" }}>00:00</div>
 				<div style={{ color: "var(--text-muted)" }}>preview</div>
 			</div>
 			<div
