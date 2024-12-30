@@ -110,6 +110,7 @@ const ItemView = ({
   app: App;
   isSelected: boolean;
 }) => {
+  const folder = file.parent;
   return (
     <div
       className={
@@ -141,7 +142,7 @@ const ItemView = ({
       </div>
       <div className="oanl__file-item-third">
         <Icon />
-        folder2
+        {folder != null ? folder.name : ""}
       </div>
     </div>
   );
