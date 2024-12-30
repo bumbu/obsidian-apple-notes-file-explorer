@@ -6,3 +6,47 @@ available in the app when your plugin is enabled.
 If your plugin does not need CSS, delete this file.
 
 */
+
+.workspace-leaf-content[data-type="apple-notes-file-explorer"] svg.svg-icon {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+  margin-right: 2px;
+}
+
+.oanl__file-item {
+  display: block;
+  border-bottom: 1px solid var(--nav-indentation-guide-color);
+  padding: 10px 0 10px 0;
+  margin: 0 12px;
+}
+.oanl__file-item.oanl__file-item--active {
+  background-color: var(--nav-item-background-active);
+  margin: 0;
+  padding: 10px 12px 10px 12px;
+}
+.oanl__file-item-title {
+  font-weight: 600;
+  font-size: var(--font-ui-small);
+  line-clamp: 1;
+  overflow: hidden;
+  -webkit-line-clamp: 1;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+}
+.oanl__file-item-secondary {
+  display: flex;
+  font-size: var(--font-ui-smaller);
+  line-clamp: 1;
+  overflow: hidden;
+}
+.oanl__file-item-secondary-datetime {
+  margin: 0 8px 0 0;
+}
+.oanl__file-item-secondary-preview {
+  color: var(--text-muted);
+}
+.oanl__file-item-third {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+  display: flex;
+}

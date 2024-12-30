@@ -11,6 +11,7 @@ const OPEN_IN_NEW_TAB = true;
 
 /*
  * TODO
+ * If file is already opnened, open that one
  * Render last change date/time
  * * For today: only the time
  * * Yesterday
@@ -111,19 +112,11 @@ const ItemView = ({
 }) => {
   return (
     <div
-      style={{
-        display: "block",
-        borderBottom: "1px solid var(--nav-indentation-guide-color)",
-        padding: "10px 0 10px 0",
-        margin: "0 12px",
-        ...(isSelected
-          ? {
-              backgroundColor: "var(--nav-item-background-active)",
-              margin: 0,
-              padding: "10px 12px 10px 12px",
-            }
-          : {}),
-      }}
+      className={
+        isSelected
+          ? "oanl__file-item oanl__file-item--active"
+          : "oanl__file-item"
+      }
       onClick={() => {
         app.workspace.openLinkText(file.path, "", OPEN_IN_NEW_TAB);
       }}
@@ -141,37 +134,12 @@ const ItemView = ({
         menu.showAtMouseEvent(event);
       }}
     >
-      <div
-        style={{
-          fontWeight: 600,
-          fontSize: "var(--font-ui-small)",
-          lineClamp: 1,
-          overflow: "hidden",
-          WebkitLineClamp: 1,
-          display: "-webkit-box",
-          WebkitBoxOrient: "vertical",
-        }}
-      >
-        {file.basename}
+      <div className="oanl__file-item-title">{file.basename}</div>
+      <div className="oanl__file-item-secondary">
+        <div className="oanl__file-item-secondary-datetime">00:00</div>
+        <div className="oanl__file-item-secondary-preview">preview</div>
       </div>
-      <div
-        style={{
-          display: "flex",
-          fontSize: "var(--font-ui-smaller)",
-          lineClamp: 1,
-          overflow: "hidden",
-        }}
-      >
-        <div style={{ margin: "0 8px 0 0" }}>00:00</div>
-        <div style={{ color: "var(--text-muted)" }}>preview</div>
-      </div>
-      <div
-        style={{
-          fontSize: "var(--font-ui-smaller)",
-          color: "var(--text-muted)",
-          display: "flex",
-        }}
-      >
+      <div className="oanl__file-item-third">
         <Icon />
         folder2
       </div>
