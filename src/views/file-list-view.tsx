@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { App, TFile } from "obsidian";
 
 import Plugin from "../main";
@@ -11,13 +11,13 @@ const OPEN_IN_NEW_TAB = true;
 
 /*
  * TODO
- * For each file, load its preview
+ * Contex menu: delete
  * Render last change date/time
  * * For today: only the time
  * * Yesterday
  * * prev week - show day name
  * * full date
- * When list of files changes, update that
+ * For each file, load its preview
  * When file contents change, update file preview
  * Render parent folder name (and a folder icon)
  */
@@ -28,13 +28,40 @@ export const FileListView = ({
 }: {
 	rootView: RootView;
 }) => {
+	const isFirstRender = useRef(true);
 	const app: App = rootView.app;
 	const plugin: Plugin = rootView.plugin;
-	// Only take last 200 files
-	const listOfFiles = app.vault.getFiles().sort((a, b) => {
-		return b.stat.mtime - a.stat.mtime;
-	}).filter((file) => SUPPORTED_EXTENSIONS.includes(file.extension)).slice(0, MAX_FILES);
 
+	// Files list
+	const [listOfFiles, setListOfFiles] = useState<TFile[]>(
+		isFirstRender ? getListOfFiles(app) : []
+	);
+	useEffect(() => {
+		const event1 = app.vault.on("delete", (file) => {
+			// Maybe: optimize by only removing the file from the list
+			setListOfFiles(getListOfFiles(app));
+		});
+		const event2 = app.vault.on("create", (file) => {
+			// Maybe: optimize by only adding the new file to the list
+			setListOfFiles(getListOfFiles(app));
+		});
+		const event3 = app.vault.on("modify", (file) => {
+			// Maybe: optimize by moving the file to the top of the list
+			setListOfFiles(getListOfFiles(app));
+		});
+		const event4 = app.vault.on("rename", (file, oldPath) => {
+			// Maybe: optimize by moving the file to the top of the list
+			setListOfFiles(getListOfFiles(app));
+		});
+		return () => {
+			app.workspace.offref(event1);
+			app.workspace.offref(event2);
+			app.workspace.offref(event3);
+			app.workspace.offref(event4);
+		}
+	}, []);
+
+	// Current selected file
 	const [currentFile, setCurrentFile] = useState<TFile | null>(
 		app.workspace.getActiveFile()
 	);
@@ -44,7 +71,9 @@ export const FileListView = ({
 			setCurrentFile(file);
 		});
 		return () => app.workspace.offref(event);
-	});
+	}, []);
+
+	isFirstRender.current = false;
 
   return (
 		<div
@@ -144,6 +173,12 @@ const Icon = () => {
 			<path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"></path>
 		</svg>
 	);
+}
+
+function getListOfFiles(app: App) {
+	return app.vault.getFiles().sort((a, b) => {
+		return b.stat.mtime - a.stat.mtime;
+	}).filter((file) => SUPPORTED_EXTENSIONS.includes(file.extension)).slice(0, MAX_FILES);
 }
 
     // --font-smallest: 0.8em;
