@@ -11,7 +11,6 @@ const OPEN_IN_NEW_TAB = true;
 
 /*
  * TODO
- * Render selected file (if any)
  * For each file, load its preview
  * Render last change date/time
  * * For today: only the time
@@ -36,7 +35,16 @@ export const FileListView = ({
 		return b.stat.mtime - a.stat.mtime;
 	}).filter((file) => SUPPORTED_EXTENSIONS.includes(file.extension)).slice(0, MAX_FILES);
 
-
+	const [currentFile, setCurrentFile] = useState<TFile | null>(
+		app.workspace.getActiveFile()
+	);
+	const currentFileIndex = listOfFiles.findIndex((file) => file.path === currentFile?.path);
+	useEffect(() => {
+		const event = app.workspace.on("file-open", (file) => {
+			setCurrentFile(file);
+		});
+		return () => app.workspace.offref(event);
+	});
 
   return (
 		<div
@@ -50,7 +58,7 @@ export const FileListView = ({
 					<ItemView
 						file={file}
 						app={app}
-						isSelected={index === 2}
+						isSelected={index === currentFileIndex}
 						key={file.path}
 					/>
 				);
