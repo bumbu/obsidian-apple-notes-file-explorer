@@ -66,10 +66,18 @@ export const FileListView = ({
 	);
 	const currentFileIndex = listOfFiles.findIndex((file) => file.path === currentFile?.path);
 	useEffect(() => {
-		const event = app.workspace.on("file-open", (file) => {
+		const event1 = app.workspace.on("file-open", (file) => {
 			setCurrentFile(file);
 		});
-		return () => app.workspace.offref(event);
+		// When a file is deleted, if it was the current one, we need to reset current file
+		// If it is still the same file, no rerender will happen
+		const event2 = app.vault.on("delete", (file) => {
+      setCurrentFile(app.workspace.getActiveFile());
+    });
+		return () => {
+			app.workspace.offref(event1);
+			app.workspace.offref(event2);
+		};
 	}, []);
 
 	isFirstRender.current = false;
