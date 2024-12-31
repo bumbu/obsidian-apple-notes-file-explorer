@@ -12,18 +12,20 @@ const OPEN_IN_NEW_TAB = true;
 /*
  * TODO
  * If file is already opnened, open that one
- * For each file, load its preview
- * When file contents change, update file preview
+ * Rename, publish
  */
 
 export const FileListView = ({ rootView }: { rootView: RootView }) => {
   const isFirstRender = useRef(true);
   const app: App = rootView.app;
-  const plugin: Plugin = rootView.plugin;
+  // const plugin: Plugin = rootView.plugin;
+
+  const [_, doRerender] = useState(0);
+  const previewCache = useRef<WeakMap<TFile, string>>(new WeakMap());
 
   // Files list
   const [listOfFiles, setListOfFiles] = useState<TFile[]>(
-    isFirstRender ? getListOfFiles(app) : []
+    isFirstRender.current ? getListOfFiles(app) : []
   );
   useEffect(() => {
     const event1 = app.vault.on("delete", (file) => {
@@ -34,9 +36,14 @@ export const FileListView = ({ rootView }: { rootView: RootView }) => {
       // Maybe: optimize by only adding the new file to the list
       setListOfFiles(getListOfFiles(app));
     });
-    const event3 = app.vault.on("modify", (file) => {
-      // Maybe: optimize by moving the file to the top of the list
-      setListOfFiles(getListOfFiles(app));
+    const event3 = app.vault.on("modify", async (file) => {
+      if (file instanceof TFile) {
+        const fileContents = await app.vault.read(file);
+        previewCache.current.set(file, parsePreviewText(fileContents));
+
+        // Maybe: optimize by only adding the new file to the list
+        setListOfFiles(getListOfFiles(app));
+      }
     });
     const event4 = app.vault.on("rename", (file, oldPath) => {
       // Maybe: optimize by moving the file to the top of the list
@@ -49,6 +56,17 @@ export const FileListView = ({ rootView }: { rootView: RootView }) => {
       app.workspace.offref(event4);
     };
   }, []);
+
+  // On first render, load preview caches, and then rerender
+  if (isFirstRender.current) {
+    const promises = listOfFiles.map(async (file) => {
+      const fileContents = await app.vault.read(file);
+      previewCache.current.set(file, parsePreviewText(fileContents));
+    });
+    Promise.all(promises).then(() => {
+      doRerender((prev) => prev + 1);
+    });
+  }
 
   // Current selected file
   const [currentFile, setCurrentFile] = useState<TFile | null>(
@@ -85,6 +103,7 @@ export const FileListView = ({ rootView }: { rootView: RootView }) => {
         return (
           <ItemView
             file={file}
+            preview={previewCache.current.get(file)}
             app={app}
             isSelected={index === currentFileIndex}
             key={file.path}
@@ -99,10 +118,12 @@ const ItemView = ({
   file,
   app,
   isSelected,
+  preview,
 }: {
   file: TFile;
   app: App;
   isSelected: boolean;
+  preview?: string;
 }) => {
   const folder = file.parent;
   return (
@@ -134,7 +155,7 @@ const ItemView = ({
         <div className="oanl__file-item-secondary-datetime">
           {new Date(file.stat.mtime).toLocaleDateString("en-GB")}
         </div>
-        <div className="oanl__file-item-secondary-preview">preview</div>
+        <div className="oanl__file-item-secondary-preview">{preview ?? ""}</div>
       </div>
       <div className="oanl__file-item-third">
         <Icon />
@@ -172,4 +193,9 @@ function getListOfFiles(app: App) {
     })
     .filter((file) => SUPPORTED_EXTENSIONS.includes(file.extension))
     .slice(0, MAX_FILES);
+}
+
+function parsePreviewText(rawText: string) {
+  // TODO handle more use cases
+  return rawText.replace(/(^---[\s\S]*?---\s*)/, "").substring(0, 40);
 }

@@ -44,9 +44,15 @@ If your plugin does not need CSS, delete this file.
 }
 .oanl__file-item-secondary-datetime {
   margin: 0 8px 0 0;
+  flex-shrink: 0;
 }
 .oanl__file-item-secondary-preview {
   color: var(--text-muted);
+  flex-shrink: 1;
+  overflow: hidden;
+  -webkit-line-clamp: 1;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
 }
 .oanl__file-item-third {
   font-size: var(--font-ui-smaller);
