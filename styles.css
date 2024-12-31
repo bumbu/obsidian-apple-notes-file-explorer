@@ -8,24 +8,26 @@ If your plugin does not need CSS, delete this file.
 */
 
 .workspace-leaf-content[data-type="apple-notes-file-explorer"] svg.svg-icon {
-  width: var(--icon-xs);
-  height: var(--icon-xs);
+  width: 13px;
+  /* width: var(--icon-xs); */
+  height: 13px;
+  /* height: var(--icon-xs); */
   margin-right: 2px;
 }
 
 .oanl__file-item {
   display: block;
   border-bottom: 1px solid var(--nav-indentation-guide-color);
-  padding: 10px 0 10px 0;
+  padding: 8px 0;
   margin: 0 12px;
 }
 .oanl__file-item.oanl__file-item--active {
   background-color: var(--nav-item-background-active);
   margin: 0;
-  padding: 10px 12px 10px 12px;
+  padding: 8px 12px 8px 12px;
 }
 .oanl__file-item-title {
-  font-weight: 600;
+  font-weight: 700;
   font-size: var(--font-ui-small);
   line-clamp: 1;
   overflow: hidden;
@@ -36,6 +38,7 @@ If your plugin does not need CSS, delete this file.
 .oanl__file-item-secondary {
   display: flex;
   font-size: var(--font-ui-smaller);
+  line-height: var(--line-height-normal);
   line-clamp: 1;
   overflow: hidden;
 }
@@ -49,4 +52,11 @@ If your plugin does not need CSS, delete this file.
   font-size: var(--font-ui-smaller);
   color: var(--text-muted);
   display: flex;
+  align-items: center;
+  margin: 1px 0 0;
+}
+.workspace-leaf-content[data-type="apple-notes-file-explorer"]
+  .oanl__file-item-third
+  svg.svg-icon {
+  margin-right: 3px;
 }

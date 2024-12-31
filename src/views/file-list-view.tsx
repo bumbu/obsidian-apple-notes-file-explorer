@@ -12,14 +12,8 @@ const OPEN_IN_NEW_TAB = true;
 /*
  * TODO
  * If file is already opnened, open that one
- * Render last change date/time
- * * For today: only the time
- * * Yesterday
- * * prev week - show day name
- * * full date
  * For each file, load its preview
  * When file contents change, update file preview
- * Render parent folder name (and a folder icon)
  */
 
 export const FileListView = ({ rootView }: { rootView: RootView }) => {
@@ -137,7 +131,9 @@ const ItemView = ({
     >
       <div className="oanl__file-item-title">{file.basename}</div>
       <div className="oanl__file-item-secondary">
-        <div className="oanl__file-item-secondary-datetime">00:00</div>
+        <div className="oanl__file-item-secondary-datetime">
+          {new Date(file.stat.mtime).toLocaleDateString("en-GB")}
+        </div>
         <div className="oanl__file-item-secondary-preview">preview</div>
       </div>
       <div className="oanl__file-item-third">
@@ -160,10 +156,10 @@ const Icon = () => {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="svg-icon lucide-folder-open"
-      // style={{width: "16px !important", height: "16px !important"}}
+      className="svg-icon lucide-folder-closed"
     >
-      <path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"></path>
+      <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"></path>
+      <path d="M2 10h20"></path>
     </svg>
   );
 };
@@ -177,11 +173,3 @@ function getListOfFiles(app: App) {
     .filter((file) => SUPPORTED_EXTENSIONS.includes(file.extension))
     .slice(0, MAX_FILES);
 }
-
-// --font-smallest: 0.8em;
-// --font-smaller: 0.875em;
-// --font-small: 0.933em;
-// --font-ui-smaller: 12px;
-// --font-ui-small: 13px;
-// --font-ui-medium: 15px;
-// --font-ui-large: 20px;
