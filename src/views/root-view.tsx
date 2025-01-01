@@ -8,60 +8,42 @@ import TagsOverviewPlugin from "../main";
 export const VIEW_TYPE = "apple-notes-file-explorer";
 
 export class RootView extends ItemView {
-	plugin: TagsOverviewPlugin;
-	root: Root;
+  plugin: TagsOverviewPlugin;
+  root: Root;
 
-	constructor(leaf: WorkspaceLeaf, plugin: TagsOverviewPlugin) {
-		super(leaf);
-		this.plugin = plugin;
+  constructor(leaf: WorkspaceLeaf, plugin: TagsOverviewPlugin) {
+    super(leaf);
+    this.plugin = plugin;
+  }
 
-		// Listen on file changes and update the list of tagged files
-		plugin.registerEvent(
-			this.app.metadataCache.on("changed", (modifiedFile: TFile) => {
-				this.render();
-			})
-		);
+  refresh() {
+    this.render();
+  }
 
-		// Remove deleted files from the list
-		plugin.registerEvent(
-			this.app.vault.on("delete", (deletedFile: TFile) => {
-				this.render();
-			})
-		);
-	}
+  getViewType() {
+    return VIEW_TYPE;
+  }
 
-	refresh() {
-		this.render();
-	}
+  getDisplayText() {
+    return "File Explorer";
+  }
 
-	getViewType() {
-		return VIEW_TYPE;
-	}
+  getIcon(): string {
+    return "folder";
+  }
 
-	getDisplayText() {
-		return "File Explorer";
-	}
+  async onOpen() {
+    this.root = createRoot(this.containerEl.children[1]);
+    this.render();
+  }
 
-	getIcon(): string {
-		return "folder";
-	}
+  render() {
+    if (this.root) {
+      this.root.render(<FileListView rootView={this} />);
+    }
+  }
 
-	async onOpen() {
-		this.root = createRoot(this.containerEl.children[1]);
-		this.render();
-	}
-
-	render() {
-		if (this.root) {
-			this.root.render(
-				<FileListView
-					rootView={this}
-				/>
-			);
-		}
-	}
-
-	async onClose() {
-		this.root.unmount();
-	}
+  async onClose() {
+    this.root.unmount();
+  }
 }
