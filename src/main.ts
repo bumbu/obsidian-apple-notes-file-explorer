@@ -1,17 +1,11 @@
 import {
   App,
-  Editor,
-  MarkdownView,
-  Modal,
-  Notice,
   Plugin,
   PluginSettingTab,
   Setting,
   WorkspaceLeaf,
 } from "obsidian";
 import { RootView, VIEW_TYPE } from "./views/root-view";
-
-// Remember to rename these classes and interfaces!
 
 enum OpenInType {
   newTab = "newTab",

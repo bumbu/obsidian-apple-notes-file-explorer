@@ -1,4 +1,4 @@
-import { ItemView, TFile, WorkspaceLeaf } from "obsidian";
+import { ItemView, WorkspaceLeaf } from "obsidian";
 
 import * as React from "react";
 import { FileListView } from "./file-list-view";
