@@ -1,15 +1,9 @@
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
-import { App, TFile, Menu } from "obsidian";
+import { App, TFile, Menu, WorkspaceLeaf } from "obsidian";
 
 import Plugin from "../main";
 import { RootView } from "./root-view";
-
-/*
- * TODO
- * If file is already opnened, open that one
- * Rename, publish
- */
 
 export const FileListView = ({ rootView }: { rootView: RootView }) => {
   const isFirstRender = useRef(true);
@@ -143,12 +137,16 @@ const ItemView = ({
             plugin.settings.openInNewTab === "newTab"
           );
         } else if (plugin.settings.openInNewTab === "auto") {
-          // TODO
-          // app.workspace.openLinkText(
-          //   file.path,
-          //   "",
-          //   !app.workspace.getActiveFile()?.path.includes(file.path)
-          // );
+          let foundTab = false;
+          app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
+            if (!foundTab && leaf.getViewState().state?.file == file.path) {
+              foundTab = true;
+              app.workspace.setActiveLeaf(leaf, { focus: true });
+            }
+          });
+          if (!foundTab) {
+            app.workspace.openLinkText(file.path, "", true);
+          }
         }
       }}
       onContextMenu={(event) => {
@@ -162,7 +160,7 @@ const ItemView = ({
               app.vault.delete(file);
             })
         );
-        menu.showAtMouseEvent(event);
+        menu.showAtMouseEvent(event as unknown as MouseEvent);
       }}
     >
       <div className="oanl__file-item-title">{file.basename}</div>
