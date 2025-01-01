@@ -2,6 +2,8 @@
 
 Adds the option of a file explorer that looks similar to Apple Notes one ordered by last modified date.
 
+To open the file explorer, click on the icon in the sidebar.
+
 <img src="assets/obsidian-apple-notes-file-explorer.png" alt="File Explorer demo" width="800" />
 
 ## Installation via <abbr title="Beta Reviewers Auto-update Tester">BRAT</abbr> (for pre-releases or betas)
