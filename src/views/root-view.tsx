@@ -10,6 +10,7 @@ export const VIEW_TYPE = "apple-notes-file-explorer";
 export class RootView extends ItemView {
   plugin: TagsOverviewPlugin;
   root: Root;
+  cacheBust: number = 0;
 
   constructor(leaf: WorkspaceLeaf, plugin: TagsOverviewPlugin) {
     super(leaf);
@@ -17,6 +18,7 @@ export class RootView extends ItemView {
   }
 
   refresh() {
+    this.cacheBust++;
     this.render();
   }
 
@@ -39,7 +41,7 @@ export class RootView extends ItemView {
 
   render() {
     if (this.root) {
-      this.root.render(<FileListView rootView={this} />);
+      this.root.render(<FileListView rootView={this} key={this.cacheBust} />);
     }
   }
 

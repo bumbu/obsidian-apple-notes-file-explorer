@@ -13,12 +13,22 @@ import { RootView, VIEW_TYPE } from "./views/root-view";
 
 // Remember to rename these classes and interfaces!
 
+enum OpenInType {
+  newTab = "newTab",
+  currentTab = "currentTab",
+  auto = "auto",
+}
+
 interface FileExplorerSettings {
-  mySetting: string;
+  maxFiles: number;
+  supportedExtensions: string[];
+  openInNewTab: OpenInType;
 }
 
 const DEFAULT_SETTINGS: FileExplorerSettings = {
-  mySetting: "default",
+  maxFiles: 200,
+  supportedExtensions: ["md", "txt"],
+  openInNewTab: OpenInType.auto,
 };
 
 export default class FileExplorer extends Plugin {
@@ -88,15 +98,50 @@ class SampleSettingTab extends PluginSettingTab {
     containerEl.empty();
 
     new Setting(containerEl)
-      .setName("Setting #1")
-      .setDesc("It's a secret")
+      .setName("Max number of files")
+      // .setDesc('It\'s a secret')
       .addText((text) =>
         text
-          .setPlaceholder("Enter your secret")
-          .setValue(this.plugin.settings.mySetting)
+          .setPlaceholder("200")
+          .setValue(this.plugin.settings.maxFiles.toString())
           .onChange(async (value) => {
-            this.plugin.settings.mySetting = value;
+            this.plugin.settings.maxFiles = parseInt(value, 10);
             await this.plugin.saveSettings();
+            await this.plugin.refreshView();
+          })
+      );
+
+    new Setting(containerEl)
+      .setName("Supported extensions")
+      .setDesc("Separated by comma")
+      .addText((text) =>
+        text
+          .setPlaceholder("md, txt")
+          .setValue(this.plugin.settings.supportedExtensions.join(", "))
+          .onChange(async (value) => {
+            this.plugin.settings.supportedExtensions = value
+              .split(",")
+              .map((ext) => ext.trim());
+            await this.plugin.saveSettings();
+            await this.plugin.refreshView();
+          })
+      );
+
+    new Setting(containerEl)
+      .setName("Open in new tab")
+      .setDesc("auto will open in new tab if the file is not already opened")
+      .addDropdown((dropdown) =>
+        dropdown
+          .addOptions({
+            [OpenInType.newTab]: "New Tab",
+            [OpenInType.currentTab]: "Current Tab",
+            [OpenInType.auto]: "Auto",
+          })
+          .setValue(this.plugin.settings.openInNewTab)
+          .onChange(async (value) => {
+            this.plugin.settings.openInNewTab = value as OpenInType;
+            await this.plugin.saveSettings();
+            // No need to refresh the view as the settings is a refecence that is read on click
           })
       );
   }

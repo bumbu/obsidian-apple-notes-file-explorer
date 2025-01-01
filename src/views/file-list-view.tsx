@@ -5,10 +5,6 @@ import { App, TFile, Menu } from "obsidian";
 import Plugin from "../main";
 import { RootView } from "./root-view";
 
-const MAX_FILES = 200;
-const SUPPORTED_EXTENSIONS = ["md", "txt"];
-const OPEN_IN_NEW_TAB = true;
-
 /*
  * TODO
  * If file is already opnened, open that one
@@ -18,23 +14,23 @@ const OPEN_IN_NEW_TAB = true;
 export const FileListView = ({ rootView }: { rootView: RootView }) => {
   const isFirstRender = useRef(true);
   const app: App = rootView.app;
-  // const plugin: Plugin = rootView.plugin;
+  const plugin: Plugin = rootView.plugin;
 
   const [_, doRerender] = useState(0);
   const previewCache = useRef<WeakMap<TFile, string>>(new WeakMap());
 
   // Files list
   const [listOfFiles, setListOfFiles] = useState<TFile[]>(
-    isFirstRender.current ? getListOfFiles(app) : []
+    isFirstRender.current ? getListOfFiles(app, plugin) : []
   );
   useEffect(() => {
     const event1 = app.vault.on("delete", (file) => {
       // Maybe: optimize by only removing the file from the list
-      setListOfFiles(getListOfFiles(app));
+      setListOfFiles(getListOfFiles(app, plugin));
     });
     const event2 = app.vault.on("create", (file) => {
       // Maybe: optimize by only adding the new file to the list
-      setListOfFiles(getListOfFiles(app));
+      setListOfFiles(getListOfFiles(app, plugin));
     });
     const event3 = app.vault.on("modify", async (file) => {
       if (file instanceof TFile) {
@@ -42,12 +38,12 @@ export const FileListView = ({ rootView }: { rootView: RootView }) => {
         previewCache.current.set(file, parsePreviewText(fileContents));
 
         // Maybe: optimize by only adding the new file to the list
-        setListOfFiles(getListOfFiles(app));
+        setListOfFiles(getListOfFiles(app, plugin));
       }
     });
     const event4 = app.vault.on("rename", (file, oldPath) => {
       // Maybe: optimize by moving the file to the top of the list
-      setListOfFiles(getListOfFiles(app));
+      setListOfFiles(getListOfFiles(app, plugin));
     });
     return () => {
       app.workspace.offref(event1);
@@ -105,6 +101,7 @@ export const FileListView = ({ rootView }: { rootView: RootView }) => {
             file={file}
             preview={previewCache.current.get(file)}
             app={app}
+            plugin={plugin}
             isSelected={index === currentFileIndex}
             key={file.path}
           />
@@ -117,11 +114,13 @@ export const FileListView = ({ rootView }: { rootView: RootView }) => {
 const ItemView = ({
   file,
   app,
+  plugin,
   isSelected,
   preview,
 }: {
   file: TFile;
   app: App;
+  plugin: Plugin;
   isSelected: boolean;
   preview?: string;
 }) => {
@@ -134,7 +133,23 @@ const ItemView = ({
           : "oanl__file-item"
       }
       onClick={() => {
-        app.workspace.openLinkText(file.path, "", OPEN_IN_NEW_TAB);
+        if (
+          plugin.settings.openInNewTab === "newTab" ||
+          plugin.settings.openInNewTab === "currentTab"
+        ) {
+          app.workspace.openLinkText(
+            file.path,
+            "",
+            plugin.settings.openInNewTab === "newTab"
+          );
+        } else if (plugin.settings.openInNewTab === "auto") {
+          // TODO
+          // app.workspace.openLinkText(
+          //   file.path,
+          //   "",
+          //   !app.workspace.getActiveFile()?.path.includes(file.path)
+          // );
+        }
       }}
       onContextMenu={(event) => {
         // Actions
@@ -185,14 +200,16 @@ const Icon = () => {
   );
 };
 
-function getListOfFiles(app: App) {
+function getListOfFiles(app: App, plugin: Plugin) {
   return app.vault
     .getFiles()
     .sort((a, b) => {
       return b.stat.mtime - a.stat.mtime;
     })
-    .filter((file) => SUPPORTED_EXTENSIONS.includes(file.extension))
-    .slice(0, MAX_FILES);
+    .filter((file) =>
+      plugin.settings.supportedExtensions.includes(file.extension)
+    )
+    .slice(0, plugin.settings.maxFiles);
 }
 
 function parsePreviewText(rawText: string) {
