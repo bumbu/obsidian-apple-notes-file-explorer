@@ -1,11 +1,11 @@
 {
-	"id": "obsidian-apple-notes-file-explorer",
-	"name": "Apple Notes File Explorer",
-	"version": "1.0.0",
-	"minAppVersion": "0.15.0",
-	"description": "Files list like in apple notes",
-	"author": "Obsidian",
-	"authorUrl": "https://bumbu.me",
-	"fundingUrl": "https://bumbu.me",
-	"isDesktopOnly": false
+  "id": "obsidian-apple-notes-file-explorer",
+  "name": "Apple Notes File Explorer",
+  "version": "1.0.0",
+  "minAppVersion": "0.15.0",
+  "description": "Files Explorer like in Apple Notes",
+  "author": "bumbu",
+  "authorUrl": "https://bumbu.me",
+  "fundingUrl": "https://ko-fi.com/bumbu",
+  "isDesktopOnly": false
 }
