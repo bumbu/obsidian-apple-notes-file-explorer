@@ -2,7 +2,7 @@
 
 Adds the option of a file explorer that looks similar to Apple Notes one ordered by last modified date.
 
-<img src="assets/obsidian-apple-notes-file-explorer.png" alt="File Explorer demo" width="400" />
+<img src="assets/obsidian-apple-notes-file-explorer.png" alt="File Explorer demo" width="800" />
 
 ## Installation via <abbr title="Beta Reviewers Auto-update Tester">BRAT</abbr> (for pre-releases or betas)
 
