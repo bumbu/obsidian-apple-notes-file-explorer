@@ -28,7 +28,7 @@ export const FileListView = ({ rootView }: { rootView: RootView }) => {
     });
     const event3 = app.vault.on("modify", async (file) => {
       if (file instanceof TFile) {
-        const fileContents = await app.vault.read(file);
+        const fileContents = await app.vault.cachedRead(file);
         previewCache.current.set(file, parsePreviewText(fileContents));
 
         // Maybe: optimize by only adding the new file to the list
@@ -156,8 +156,8 @@ const ItemView = ({
           item
             .setTitle("Delete")
             .setIcon("delete")
-            .onClick((event) => {
-              app.vault.delete(file);
+            .onClick(() => {
+              app.fileManager.trashFile(file);
             })
         );
         menu.showAtMouseEvent(event as unknown as MouseEvent);

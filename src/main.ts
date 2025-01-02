@@ -13,20 +13,20 @@ enum OpenInType {
   auto = "auto",
 }
 
-interface FileExplorerSettings {
+interface AppleNotesFileExplorerSettings {
   maxFiles: number;
   supportedExtensions: string[];
   openInNewTab: OpenInType;
 }
 
-const DEFAULT_SETTINGS: FileExplorerSettings = {
+const DEFAULT_SETTINGS: AppleNotesFileExplorerSettings = {
   maxFiles: 200,
   supportedExtensions: ["md", "txt"],
   openInNewTab: OpenInType.auto,
 };
 
-export default class FileExplorer extends Plugin {
-  settings: FileExplorerSettings;
+export default class AppleNotesFileExplorer extends Plugin {
+  settings: AppleNotesFileExplorerSettings;
 
   async onload() {
     await this.loadSettings();
@@ -38,7 +38,7 @@ export default class FileExplorer extends Plugin {
     });
 
     // This adds a settings tab so the user can configure various aspects of the plugin
-    this.addSettingTab(new SampleSettingTab(this.app, this));
+    this.addSettingTab(new AppleNotesFileExplorerTab(this.app, this));
   }
 
   async activateView() {
@@ -78,10 +78,10 @@ export default class FileExplorer extends Plugin {
   }
 }
 
-class SampleSettingTab extends PluginSettingTab {
-  plugin: FileExplorer;
+class AppleNotesFileExplorerTab extends PluginSettingTab {
+  plugin: AppleNotesFileExplorer;
 
-  constructor(app: App, plugin: FileExplorer) {
+  constructor(app: App, plugin: AppleNotesFileExplorer) {
     super(app, plugin);
     this.plugin = plugin;
   }
